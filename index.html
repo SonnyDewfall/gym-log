@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f5fd1">
+<title>Gym Log</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column, sticky top tabs, exercise cards, rest timer docked at the bottom. Plate-blue accent, chalk greys. */
+:root{
+  --bg:#eceef1; --surface:#ffffff; --ink:#15181d; --muted:#5d6570; --line:#d6dae0;
+  --accent:#1f5fd1; --accent-ink:#ffffff; --done:#1d8a52; --done-bg:#e3f4ea; --warn:#b4471b;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101318; --surface:#1a1e25; --ink:#eef1f5; --muted:#9aa3ae; --line:#2c323c;
+    --accent:#5b8ff0; --accent-ink:#0c1220; --done:#4cc489; --done-bg:#16301f; --warn:#ef8a5c;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101318; --surface:#1a1e25; --ink:#eef1f5; --muted:#9aa3ae; --line:#2c323c;
+  --accent:#5b8ff0; --accent-ink:#0c1220; --done:#4cc489; --done-bg:#16301f; --warn:#ef8a5c;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 var(--body);-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;margin:0;text-wrap:balance}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 120px}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 16px 8px;border-bottom:1px solid var(--line)}
+.top-inner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--display);font-size:24px;font-weight:700;margin-right:auto}
+nav.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+nav.tabs button{border:0;background:none;padding:6px 12px;border-radius:7px;font-weight:600;color:var(--muted)}
+nav.tabs button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.status{font-size:13px;color:var(--muted);padding:8px 0 0}
+.status.err{color:var(--warn)}
+section{display:grid;gap:12px;padding-top:16px}
+.sec-h{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+.sec-h h2{font-size:22px}
+.sec-h .sub{color:var(--muted);font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.grow{flex:1 1 auto;min-width:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pill.done{background:var(--done-bg);border-color:transparent;color:var(--done)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 14px;font-weight:600;min-height:42px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:none}
+.btn.danger{color:var(--warn)}
+.btn.full{width:100%}
+.btn.ok{background:var(--done-bg);border-color:transparent;color:var(--done)}
+.btn:disabled{opacity:.5;cursor:default}
+.wo{display:flex;align-items:center;gap:12px}
+.wo h3{font-size:19px}
+.group-label{font-family:var(--display);font-size:15px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.ss{border-left:3px solid var(--accent);padding-left:10px;display:grid;gap:12px}
+.ex h3{font-size:20px}
+.target{font-variant-numeric:tabular-nums;font-weight:600}
+.cue{font-size:14px;color:var(--muted)}
+.sets{display:grid;gap:6px}
+.set{display:grid;grid-template-columns:28px 1fr 1fr 48px;gap:8px;align-items:center}
+.set .n{font-family:var(--display);font-size:18px;color:var(--muted);text-align:center}
+.set input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-variant-numeric:tabular-nums;font-size:17px;text-align:center}
+.set.is-done input{border-color:var(--done);background:var(--done-bg)}
+.tick{width:48px;height:42px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1}
+.set.is-done .tick{background:var(--done);border-color:var(--done);color:#fff}
+.set-head{display:grid;grid-template-columns:28px 1fr 1fr 48px;gap:8px;font-size:12px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.05em}
+textarea{width:100%;min-height:64px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);resize:vertical}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+label.f input,label.f select,label.f textarea{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:400px){.grid4{grid-template-columns:1fr 1fr}}
+.check{display:flex;align-items:center;gap:6px;font-size:14px}
+.hist-line{font-size:14px;font-variant-numeric:tabular-nums}
+.hist-note{font-size:14px;color:var(--muted);font-style:italic}
+.timer{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--ink);color:var(--bg);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.timer-inner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.timer .clock{font-family:var(--display);font-size:34px;font-variant-numeric:tabular-nums;min-width:84px}
+.timer .lbl{flex:1;font-size:14px;opacity:.8}
+.timer button{background:transparent;border:1px solid currentColor;color:inherit;border-radius:8px;padding:8px 10px;font-weight:600}
+.timer.over .clock{color:var(--done)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:16px}
+.modal .card{max-width:480px;width:100%}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.set.is-done .tick{transition:background .15s}}
+
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.chip.ok{color:var(--done)} .chip.warn{color:var(--warn)}
+nav.tabs button{padding:6px 10px}
+@media (max-width:380px){.brand{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Gym Log</div>
+    <nav class="tabs" aria-label="Views">
+      <button id="tab-today" data-action="tab" data-tab="today">Today</button>
+      <button id="tab-plan" data-action="tab" data-tab="plan">Plan</button>
+      <button id="tab-history" data-action="tab" data-tab="history">History</button>
+      <button id="tab-sync" data-action="tab" data-tab="sync">Sync</button>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <div id="status" class="status" role="status"></div>
+  <main id="main"></main>
+</div>
+<div id="timer" class="timer" hidden></div>
+<div id="modal-root"></div>
+<input type="file" id="import-file" accept="application/json,.json" hidden>
+<script src="config.js"></script>
+<script src="store.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="app.js"></script>
+</body>
+</html>
