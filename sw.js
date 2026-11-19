@@ -1,6 +1,6 @@
 // Offline support: keeps the app's own files on the phone so it opens with no signal.
 // Bump VERSION whenever the app files change.
-const VERSION = "gymlog-v2";
+const VERSION = "gymlog-v3";
 const SHELL = ["./", "index.html", "app.js", "store.js", "config.js", "seed.json", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (e) => {

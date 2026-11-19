@@ -1,13 +1,13 @@
 (function () {
 "use strict";
 var CFG = window.GYMLOG_CONFIG || {};
-var S = { tab: "today", draft: null, editDraft: null, openHist: {}, timer: null };
+var S = { tab: "today", draft: null, editDraft: null, openHist: {}, openExHist: {}, histQuery: "", histLimit: 30, timer: null };
 var $main = document.getElementById("main");
 var $status = document.getElementById("status");
 
 var store = new window.GymStore.Store({
   clientId: (CFG.googleClientId || "").trim(),
-  onChange: function () { refreshDraftFromStore(); render(); },
+  onChange: function () { dirtyCache(); refreshDraftFromStore(); render(); },
   onStatus: function () { renderStatus(); if (S.tab === "sync") render(); }
 });
 
@@ -15,7 +15,7 @@ function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function
 function num(v) { var n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : null; }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function todayISO() { var d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
-function fmtDate(iso) { try { return new Date(iso + "T12:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }); } catch (e) { return iso; } }
+function fmtDate(iso) { try { var d = new Date(iso + "T12:00:00"), o = { weekday: "short", day: "numeric", month: "short" }; if (d.getFullYear() !== new Date().getFullYear()) o.year = "numeric"; return d.toLocaleDateString("en-GB", o); } catch (e) { return iso; } }
 function fmtTime(ms) { try { return new Date(ms).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function note(t, err) { $status.textContent = t || ""; $status.className = "status" + (err ? " err" : ""); }
@@ -23,7 +23,26 @@ function note(t, err) { $status.textContent = t || ""; $status.className = "stat
 function workouts() {
   return store.list("workouts").sort(function (a, b) { return (a.day - b.day) || ((a.order || 0) - (b.order || 0)) || String(a.name).localeCompare(String(b.name)); });
 }
-function sessions() { return store.list("sessions").sort(function (a, b) { return (b.startedAt || 0) - (a.startedAt || 0); }); }
+var listCache = null, histCache = null;
+function dirtyCache() { listCache = null; histCache = null; }
+function sessions() { if (!listCache) listCache = store.list("sessions").sort(function (a, b) { return (b.startedAt || 0) - (a.startedAt || 0); }); return listCache; }
+function exKey(n) { return String(n || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+function topWeight(ex) { var t = null; (ex.sets || []).forEach(function (st) { if ((st.done || st.r != null) && st.w != null && (t == null || st.w > t)) t = st.w; }); return t; }
+// Every finished session's sets, grouped by exercise name, newest first.
+function historyIndex() {
+  if (histCache) return histCache;
+  var idx = {};
+  sessions().forEach(function (s) {
+    if (!s.finishedAt) return;
+    (s.exercises || []).forEach(function (ex) {
+      var raw = setsRaw(ex); if (!raw) return;
+      var k = exKey(ex.name);
+      (idx[k] = idx[k] || []).push({ date: s.date, sid: s.id, name: ex.name, raw: raw, top: topWeight(ex), note: ex.note || "" });
+    });
+  });
+  histCache = idx; return idx;
+}
+function bestOf(list) { var b = null; list.forEach(function (e) { if (e.top != null && (b == null || e.top > b.top)) b = e; }); return b; }
 
 /* ---------- formatting ---------- */
 function repText(ex) {
@@ -32,7 +51,8 @@ function repText(ex) {
   return r + u + (ex.perSide ? "/side" : "");
 }
 function targetText(ex) {
-  var p = [(ex.sets || 0) + " × " + repText(ex)];
+  var n = Array.isArray(ex.sets) ? ex.sets.length : (ex.sets || 0);
+  var p = [n + " × " + repText(ex)];
   if (ex.weight != null && ex.weight !== "") p.push(ex.weight + " kg");
   if (ex.rest) p.push("rest " + ex.rest + "s");
   return p.join(" · ");
@@ -52,12 +72,12 @@ var saveT = null;
 function saveDraft(now) {
   if (saveT) { clearTimeout(saveT); saveT = null; }
   if (!S.draft) return;
-  var go = function () { var d = clone(S.draft); store.put("sessions", d.id, d); S.draft.updatedAt = store.data.sessions[d.id].updatedAt; };
+  var go = function () { var d = clone(S.draft); store.put("sessions", d.id, d); S.draft.updatedAt = store.data.sessions[d.id].updatedAt; dirtyCache(); };
   if (now) go(); else saveT = setTimeout(go, 500);
 }
 function openSession() { return sessions().filter(function (s) { return !s.finishedAt; })[0] || null; }
 function refreshDraftFromStore() {
-  if (!S.draft) { var o = openSession(); if (o) S.draft = o; return; }
+  if (!S.draft) { var o = openSession(); if (o) S.draft = clone(o); return; }
   var r = store.data.sessions[S.draft.id];
   if (!r || r.deleted) { S.draft = null; return; }
   if ((r.updatedAt || 0) > (S.draft.updatedAt || 0) && !isTyping()) { var id = S.draft.id; S.draft = clone(r); S.draft.id = id; }
@@ -134,7 +154,13 @@ function renderExCard(ex, i, tag) {
   var h = '<div class="card ex" id="ex-' + i + '"><div class="row"><div class="grow"><h3>' + (tag ? '<span class="pill">' + esc(tag) + '</span> ' : '') + esc(ex.name) + '</h3>' +
     '<div class="target">' + esc(targetText(ex)) + '</div></div>' + (allDone ? '<span class="pill done">Done</span>' : '') + '</div>';
   if (ex.cue) h += '<div class="cue">' + esc(ex.cue) + '</div>';
-  if (ex.last) h += '<div class="cue">Last time: ' + esc(ex.last) + '</div>';
+  var hist = (historyIndex()[exKey(ex.name)] || []).filter(function (e) { return e.sid !== S.draft.id; });
+  if (hist.length) {
+    var best = bestOf(hist), hk = S.draft.id + ":" + exKey(ex.name), hOpen = !!S.openExHist[hk];
+    h += '<div class="cue"><strong>Last:</strong> ' + esc(hist[0].raw) + ' (' + esc(fmtDate(hist[0].date)) + ')' + (best ? ' · <strong>Best:</strong> ' + esc(best.top) + ' kg (' + esc(fmtDate(best.date)) + ')' : '') + '</div>';
+    if (hOpen) h += '<div class="sets">' + hist.slice(0, 10).map(function (e) { return '<div class="hist-line"><span class="muted">' + esc(fmtDate(e.date)) + '</span> ' + esc(e.raw) + '</div>' + (e.note ? '<div class="hist-note">' + esc(e.note) + '</div>' : ''); }).join('') + '</div>';
+    h += '<button class="btn ghost small" data-action="exhist" data-key="' + esc(hk) + '" aria-expanded="' + hOpen + '">' + (hOpen ? 'Hide history' : 'Show history (' + hist.length + ')') + '</button>';
+  }
   if (!allDone) {
     var w = (ex.weight != null && ex.weight !== "") ? (' @ ' + ex.weight + ' kg') : '';
     h += '<button class="btn ok full" data-action="quick" data-i="' + i + '">✓ Did it: ' + (ex.sets || []).length + ' × ' + esc(targetReps(ex)) + (ex.unit === "secs" ? 's' : '') + w + '</button>';
@@ -147,7 +173,8 @@ function renderExCard(ex, i, tag) {
       '<button class="tick" data-action="tick" data-i="' + i + '" data-j="' + j + '" aria-pressed="' + (st.done ? 'true' : 'false') + '" aria-label="Mark set ' + (j + 1) + ' done">✓</button></div>';
   });
   h += '</div><div class="row"><button class="btn ghost small" data-action="addset" data-i="' + i + '">+ Set</button>' +
-    ((ex.sets || []).length > 1 ? '<button class="btn ghost small" data-action="rmset" data-i="' + i + '">− Set</button>' : '') + '</div>';
+    ((ex.sets || []).length > 1 ? '<button class="btn ghost small" data-action="rmset" data-i="' + i + '">− Set</button>' : '') +
+    '<button class="btn ghost small danger" data-action="exremove" data-i="' + i + '" style="margin-left:auto">Remove exercise</button></div>';
   h += '<label class="f" for="note-' + i + '">Notes<textarea id="note-' + i + '" data-field="note" data-i="' + i + '" placeholder="How it felt, form, pain, machine settings">' + esc(ex.note || "") + '</textarea></label>';
   return h + '</div>';
 }
@@ -197,9 +224,29 @@ function renderEditor() {
 
 function renderHistory() {
   var fin = sessions().filter(function (s) { return s.finishedAt; });
-  var h = '<section><div class="card"><h2>History</h2><div class="muted small">' + fin.length + ' finished session' + (fin.length === 1 ? '' : 's') + '. Tap one to see or edit it.</div></div>';
-  if (!fin.length) h += '<div class="empty">Nothing logged yet.</div>';
-  fin.forEach(function (s) {
+  var h = '<section><div class="card"><h2>History</h2><div class="muted small">' + fin.length + ' finished session' + (fin.length === 1 ? '' : 's') + '. Search an exercise to see every time you did it.</div>' +
+    '<label class="f" for="hist-search">Find an exercise<input id="hist-search" type="search" autocomplete="off" placeholder="e.g. leg press, pull up" value="' + esc(S.histQuery) + '"></label></div>';
+  return h + '<div id="hist-results" style="display:grid;gap:12px">' + renderHistResults() + '</div></section>';
+}
+function renderHistResults() {
+  var q = exKey(S.histQuery);
+  if (q.length >= 2) {
+    var idx = historyIndex(), words = q.split(" ");
+    var keys = Object.keys(idx).filter(function (k) { return words.every(function (w) { return k.indexOf(w) >= 0; }); });
+    keys.sort(function (a, b) { return String(idx[b][0].date).localeCompare(String(idx[a][0].date)); });
+    if (!keys.length) return '<div class="empty">No exercise matches “' + esc(S.histQuery) + '”.</div>';
+    return keys.slice(0, 12).map(function (k) {
+      var list = idx[k], best = bestOf(list);
+      return '<div class="card"><div class="row"><h3 class="grow">' + esc(list[0].name) + '</h3><span class="pill">' + list.length + ' time' + (list.length === 1 ? '' : 's') + '</span></div>' +
+        (best ? '<div class="target">Best: ' + esc(best.top) + ' kg (' + esc(fmtDate(best.date)) + ')</div>' : '') +
+        list.slice(0, 15).map(function (e) { return '<div class="hist-line"><span class="muted">' + esc(fmtDate(e.date)) + '</span> ' + esc(e.raw) + '</div>' + (e.note ? '<div class="hist-note">' + esc(e.note) + '</div>' : ''); }).join('') +
+        (list.length > 15 ? '<div class="muted small">Showing the latest 15 of ' + list.length + '.</div>' : '') + '</div>';
+    }).join('');
+  }
+  var fin = sessions().filter(function (s) { return s.finishedAt; });
+  if (!fin.length) return '<div class="empty">Nothing logged yet.</div>';
+  var h = '';
+  fin.slice(0, S.histLimit).forEach(function (s) {
     var open = !!S.openHist[s.id];
     h += '<div class="card"><button class="btn ghost full" style="text-align:left;border:0;padding:0;min-height:0" data-action="hist" data-id="' + esc(s.id) + '" aria-expanded="' + open + '"><div class="row"><div class="grow"><h3>' + esc(s.workoutName) + '</h3><div class="muted small">' + esc(fmtDate(s.date)) + (s.variant ? ' · ' + esc(s.variant) : '') + '</div></div><span class="muted">' + (open ? '▲' : '▼') + '</span></div></button>';
     if (open) {
@@ -212,7 +259,8 @@ function renderHistory() {
     }
     h += '</div>';
   });
-  return h + '</section>';
+  if (fin.length > S.histLimit) h += '<button class="btn full" data-action="histmore">Show more (' + (fin.length - S.histLimit) + ' older)</button>';
+  return h;
 }
 function setsSummary(ex) { return esc(setsRaw(ex)); }
 function setsRaw(ex) {
@@ -239,14 +287,6 @@ function renderSync() {
 }
 
 /* ---------- actions ---------- */
-function lastFor(name, wid) {
-  var prev = sessions().filter(function (s) { return s.finishedAt; });
-  for (var k = 0; k < prev.length; k++) {
-    var ex = (prev[k].exercises || []).filter(function (e) { return e.name === name; })[0];
-    if (ex && setsRaw(ex)) return setsRaw(ex) + ' (' + fmtDate(prev[k].date) + ')';
-  }
-  return "";
-}
 function startWorkout(id) {
   var w = store.get("workouts", id); if (!w) return;
   var s = { id: "s-" + uid(), workoutId: id, workoutName: w.name, variant: w.variant || "", day: w.day, warmup: w.warmup || "",
@@ -254,7 +294,7 @@ function startWorkout(id) {
     exercises: (w.exercises || []).map(function (ex) {
       var n = Math.max(1, parseInt(ex.sets, 10) || 1), sets = [];
       for (var k = 0; k < n; k++) sets.push({ w: null, r: null, done: false });
-      return { name: ex.name, group: ex.group || null, unit: ex.unit || "reps", perSide: !!ex.perSide, sets: sets, repMin: ex.repMin, repMax: ex.repMax, weight: ex.weight, rest: ex.rest || 0, cue: ex.cue || "", last: lastFor(ex.name), note: "" };
+      return { name: ex.name, group: ex.group || null, unit: ex.unit || "reps", perSide: !!ex.perSide, sets: sets, repMin: ex.repMin, repMax: ex.repMax, weight: ex.weight, rest: ex.rest || 0, cue: ex.cue || "", note: "" };
     }) };
   S.draft = s; saveDraft(true); render(); window.scrollTo(0, 0);
 }
@@ -351,9 +391,16 @@ document.addEventListener("click", function (e) {
     case "discard":
       confirmBox(d.finishedAt ? "Delete this logged session? This can't be undone." : "Discard this session? Anything you logged in it will be lost.", d.finishedAt ? "Delete" : "Discard", function () {
         if (saveT) { clearTimeout(saveT); saveT = null; }
-        stopTimer(); store.remove("sessions", d.id); S.draft = null; render();
+        stopTimer(); store.remove("sessions", d.id); dirtyCache(); S.draft = null; render();
       }); break;
     case "hist": S.openHist[id] = !S.openHist[id]; render(); break;
+    case "histmore": S.histLimit += 30; render(); break;
+    case "exhist": var hk = b.getAttribute("data-key"); S.openExHist[hk] = !S.openExHist[hk]; render(); break;
+    case "exremove":
+      var rx = d.exercises[i], logged = rx.sets.some(function (st) { return st.done || st.r != null || st.w != null; });
+      var doRemove = function () { S.draft.exercises.splice(i, 1); stopTimer(); saveDraft(true); render(); };
+      if (logged) confirmBox("Remove " + rx.name + " from this session? The sets you logged for it will be lost.", "Remove", doRemove); else doRemove();
+      break;
     case "reopen":
       var s = store.get("sessions", id); if (!s) return;
       if (S.draft && S.draft.id !== id && !S.draft.finishedAt) { note("Finish or discard your open session first.", true); S.tab = "today"; render(); return; }
@@ -376,6 +423,7 @@ document.addEventListener("click", function (e) {
 
 document.addEventListener("input", function (e) {
   var t = e.target;
+  if (t.id === "hist-search") { S.histQuery = t.value; document.getElementById("hist-results").innerHTML = renderHistResults(); return; }
   if (t.hasAttribute("data-field") && S.draft) {
     var f = t.getAttribute("data-field"), i = parseInt(t.getAttribute("data-i"), 10), j = parseInt(t.getAttribute("data-j"), 10);
     if (f === "w") S.draft.exercises[i].sets[j].w = num(t.value);
