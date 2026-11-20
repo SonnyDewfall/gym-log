@@ -111,6 +111,7 @@ function render() {
 }
 function lastFinished() { return sessions().filter(function (s) { return s.finishedAt; })[0]; }
 function suggestedDay() { var l = lastFinished(); return (!l || !l.day) ? 1 : ((l.day % 3) + 1); }
+function dayLabel(d) { return d === 0 ? 'Custom sessions' : 'Day ' + d; }
 function dayList(ws) { var s = {}; ws.forEach(function (w) { s[w.day] = 1; }); return Object.keys(s).map(Number).sort(function (a, b) { return a - b; }); }
 
 function renderPicker() {
@@ -120,7 +121,7 @@ function renderPicker() {
   var h = '<section><div class="card"><h2>Pick today\'s session</h2><div class="muted small">' + (l ? ('Last: ' + esc(l.workoutName) + ' on ' + esc(fmtDate(l.date)) + '. ') : '') + 'Day ' + sug + ' is next in the rotation.</div></div>';
   dayList(ws).forEach(function (day) {
     var list = ws.filter(function (w) { return w.day === day; });
-    h += '<div class="sec-h"><h2>Day ' + day + '</h2>' + (day === sug ? '<span class="pill accent">Next up</span>' : '') + '</div>';
+    h += '<div class="sec-h"><h2>' + dayLabel(day) + '</h2>' + (day === sug ? '<span class="pill accent">Next up</span>' : '') + '</div>';
     list.forEach(function (w) {
       h += '<div class="card wo"><div class="grow"><h3>' + esc(w.name) + '</h3><div class="muted small">' + esc(w.variant || "") + (w.variant ? ' · ' : '') + (w.exercises || []).length + ' exercises</div></div>' +
         '<button class="btn primary" data-action="start" data-id="' + esc(w.id) + '">Start</button></div>';
@@ -185,7 +186,7 @@ function renderPlan() {
   if (!ws.length) h += '<div class="empty">No workouts yet.</div>';
   dayList(ws).forEach(function (day) {
     var list = ws.filter(function (w) { return w.day === day; });
-    h += '<div class="sec-h"><h2>Day ' + day + '</h2><span class="sub">' + list.length + ' variation' + (list.length > 1 ? 's' : '') + '</span></div>';
+    h += '<div class="sec-h"><h2>' + dayLabel(day) + '</h2><span class="sub">' + list.length + ' variation' + (list.length > 1 ? 's' : '') + '</span></div>';
     list.forEach(function (w) {
       h += '<div class="card"><div class="row"><div class="grow"><h3>' + esc(w.name) + '</h3><div class="muted small">' + esc(w.variant || "") + '</div></div><button class="btn" data-action="edit" data-id="' + esc(w.id) + '">Edit</button></div>';
       groupsOf(w.exercises).forEach(function (g) {
@@ -201,7 +202,7 @@ function renderEditor() {
   var w = S.editDraft;
   var h = '<section><div class="card"><h2>' + (w._new ? 'New workout' : 'Edit workout') + '</h2>' +
     '<div class="grid2"><label class="f" for="e-name">Name<input id="e-name" data-efield="name" value="' + esc(w.name) + '"></label>' +
-    '<label class="f" for="e-day">Day<select id="e-day" data-efield="day">' + [1, 2, 3, 4, 5, 6, 7].map(function (d) { return '<option value="' + d + '"' + (w.day === d ? ' selected' : '') + '>Day ' + d + '</option>'; }).join('') + '</select></label></div>' +
+    '<label class="f" for="e-day">Day<select id="e-day" data-efield="day">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function (d) { return '<option value="' + d + '"' + (w.day === d ? ' selected' : '') + '>' + (d === 0 ? 'Custom' : 'Day ' + d) + '</option>'; }).join('') + '</select></label></div>' +
     '<label class="f" for="e-variant">Variation label<input id="e-variant" data-efield="variant" value="' + esc(w.variant || "") + '" placeholder="e.g. Week 2 · Tempo"></label>' +
     '<label class="f" for="e-warmup">Warm-up<textarea id="e-warmup" data-efield="warmup">' + esc(w.warmup || "") + '</textarea></label></div>';
   (w.exercises || []).forEach(function (ex, i) {
@@ -445,14 +446,26 @@ document.addEventListener("input", function (e) {
 });
 document.addEventListener("change", function (e) { if (e.target.matches("[data-efield],[data-xfield]")) e.target.dispatchEvent(new Event("input", { bubbles: true })); });
 document.addEventListener("focusout", function () { setTimeout(function () { if (!isTyping()) { saveDraft(true); render(); } }, 0); });
-document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { saveDraft(true); store.sync(false); } });
+document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") { saveDraft(true); store.sync(false); } else { checkInbox(); } });
 window.addEventListener("online", function () { store.sync(false); });
 
 /* ---------- start ---------- */
+// Claude publishes programme changes to inbox.json in the repo. Newer records win, so
+// an edit made in the app after Claude's change is kept.
+function checkInbox() {
+  return fetch("inbox.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d || !d.workouts) return;
+    var before = JSON.stringify(store.data.workouts);
+    var merged = window.GymStore.merge(store.data, { workouts: d.workouts, sessions: {} });
+    if (JSON.stringify(merged.workouts) !== before) { store.replaceAll({ workouts: d.workouts, sessions: {} }); note("New workouts from Claude added to your programme."); }
+  }).catch(function () {});
+}
 function boot() {
   var seedP = store.isEmpty() ? fetch("seed.json").then(function (r) { return r.json(); }).then(function (seed) { store.data = window.GymStore.merge(store.data, seed); store.saveLocal(); }).catch(function () {}) : Promise.resolve();
   seedP.then(function () {
     refreshDraftFromStore(); render(); renderStatus();
+    return checkInbox();
+  }).then(function () {
     store.sync(false);
   });
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});

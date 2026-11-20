@@ -1,0 +1,88 @@
+{
+ "schema": 1,
+ "note": "Workouts published by Claude. The app merges these on open; newer edits in the app win.",
+ "workouts": {
+  "c-2026-11-20-light": {
+   "day": 0,
+   "order": 1,
+   "name": "Day 2 · Light return",
+   "variant": "Post-cold · Fri 20 Nov",
+   "warmup": "90-90 hip switches 1–2 min · easy pogos 2×15s (skip if you feel flat)",
+   "exercises": [
+    {
+     "name": "Copenhagen adductor plank",
+     "sets": 2,
+     "repMin": 30,
+     "repMax": 30,
+     "weight": null,
+     "rest": 45,
+     "cue": "Short lever (knee on bench)",
+     "group": null,
+     "unit": "secs",
+     "perSide": true
+    },
+    {
+     "name": "Machine chest press",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 12,
+     "weight": 45,
+     "rest": 0,
+     "cue": "Stop with 3 reps in the tank",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Pull-ups",
+     "sets": 3,
+     "repMin": 3,
+     "repMax": 5,
+     "weight": null,
+     "rest": 105,
+     "cue": "Overhand, shoulder width. Stop 2 short of failure",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-leg glute bridge",
+     "sets": 2,
+     "repMin": 12,
+     "repMax": 12,
+     "weight": null,
+     "rest": 0,
+     "cue": "Bodyweight, 2s hold at the top",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Calf raise (bodyweight, on a step)",
+     "sets": 2,
+     "repMin": 15,
+     "repMax": 15,
+     "weight": null,
+     "rest": 60,
+     "cue": "Slow 3s lowering",
+     "group": "B",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Cable woodchop",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 10,
+     "weight": 20,
+     "rest": 45,
+     "cue": "High-to-low, controlled",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795160062823
+  }
+ }
+}

@@ -40,3 +40,7 @@ The app only asks for the `drive.file` permission, which limits it to the file i
 - `updatedAt` is in milliseconds. A record you change must have a newer `updatedAt` than the phone's copy, or the phone's copy wins at the next sync.
 - To delete a record, replace it with `{"deleted": true, "updatedAt": <now>}`.
 - Exercises that share a `group` letter, one after another, are done as a superset. The rest timer runs only after the last exercise in the group.
+
+## Workouts from Claude (`inbox.json`)
+
+Claude publishes new or changed workouts to `inbox.json` in this repo. The app reads it every time it opens and merges it in by `updatedAt`, so an edit you make later in the app is kept. The file holds workouts only, never sessions. Use `"day": 0` for custom one-off sessions; they're listed under "Custom sessions".

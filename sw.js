@@ -1,6 +1,6 @@
 // Offline support: keeps the app's own files on the phone so it opens with no signal.
 // Bump VERSION whenever the app files change.
-const VERSION = "gymlog-v3";
+const VERSION = "gymlog-v4";
 const SHELL = ["./", "index.html", "app.js", "store.js", "config.js", "seed.json", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -19,6 +19,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith("inbox.json")) return; // always fresh from the network
   e.respondWith(
     caches.open(VERSION).then(async (cache) => {
       const cached = await cache.match(e.request, { ignoreSearch: true });
