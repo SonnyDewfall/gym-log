@@ -83,6 +83,534 @@
     }
    ],
    "updatedAt": 1795160062823
+  },
+  "d2-w1": {
+   "day": 2,
+   "order": 1,
+   "name": "Day 2 · Press, pull & leg press",
+   "variant": "Week 1 · Baseline",
+   "warmup": "90-90 hip switches 1–2 min · pogos 3×15s building effort · single-leg altitude landings 3×5 each leg (easy if the hip flexor is sore)",
+   "exercises": [
+    {
+     "name": "Copenhagen adductor plank",
+     "sets": 3,
+     "repMin": 30,
+     "repMax": 40,
+     "weight": null,
+     "rest": 45,
+     "cue": "Short lever (knee on bench)",
+     "group": null,
+     "unit": "secs",
+     "perSide": true
+    },
+    {
+     "name": "Machine chest press",
+     "sets": 3,
+     "repMin": 5,
+     "repMax": 8,
+     "weight": 50,
+     "rest": 0,
+     "cue": "Standard seat, 2s up / 2s down. Heavy range: add 2.5–5 kg once you get 3 × 8",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Pull-ups",
+     "sets": 3,
+     "repMin": 3,
+     "repMax": 5,
+     "weight": null,
+     "rest": 105,
+     "cue": "Overhand, shoulder width. Add 1 slow negative at the end",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-arm lat pulldown (cable)",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": null,
+     "rest": 60,
+     "cue": "Right (weaker) side first; left matches the right's reps, no more. Pick a weight the right can do 10 with",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg leg press",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 80,
+     "rest": 0,
+     "cue": "Foot mid-platform",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg bent-leg calf raise (leg press)",
+     "sets": 3,
+     "repMin": 12,
+     "repMax": 15,
+     "weight": 80,
+     "rest": 90,
+     "cue": "2s stretch pause",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Cable woodchop",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 10,
+     "weight": 25,
+     "rest": 45,
+     "cue": "High-to-low",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795162084325
+  },
+  "d2-w2": {
+   "day": 2,
+   "order": 2,
+   "name": "Day 2 · Press, pull & leg press",
+   "variant": "Week 2 · Tempo",
+   "warmup": "90-90 hip switches 1–2 min · pogos 3×15s building effort · single-leg altitude landings 3×5 each leg (easy if the hip flexor is sore)",
+   "exercises": [
+    {
+     "name": "Copenhagen adductor plank",
+     "sets": 3,
+     "repMin": 35,
+     "repMax": 45,
+     "weight": null,
+     "rest": 45,
+     "cue": "Short lever, longer holds",
+     "group": null,
+     "unit": "secs",
+     "perSide": true
+    },
+    {
+     "name": "Machine chest press",
+     "sets": 3,
+     "repMin": 5,
+     "repMax": 8,
+     "weight": 50,
+     "rest": 0,
+     "cue": "3s lowering, 1s pause at chest. Heavy range: add 2.5–5 kg once you get 3 × 8",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Pull-ups",
+     "sets": 3,
+     "repMin": 3,
+     "repMax": 5,
+     "weight": null,
+     "rest": 105,
+     "cue": "3s lowering on every rep",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-arm lat pulldown (cable)",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": null,
+     "rest": 60,
+     "cue": "Right (weaker) side first; left matches the right's reps, no more. Pick a weight the right can do 10 with",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg leg press",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 80,
+     "rest": 0,
+     "cue": "3s lowering",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg bent-leg calf raise (leg press)",
+     "sets": 3,
+     "repMin": 12,
+     "repMax": 15,
+     "weight": 80,
+     "rest": 90,
+     "cue": "3s lowering",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Cable woodchop",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 10,
+     "weight": 25,
+     "rest": 45,
+     "cue": "Low-to-high",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795162084325
+  },
+  "d2-w3": {
+   "day": 2,
+   "order": 3,
+   "name": "Day 2 · Press, pull & leg press",
+   "variant": "Week 3 · Angle & leverage",
+   "warmup": "90-90 hip switches 1–2 min · pogos 3×15s building effort · single-leg altitude landings 3×5 each leg (easy if the hip flexor is sore)",
+   "exercises": [
+    {
+     "name": "Copenhagen adductor plank",
+     "sets": 3,
+     "repMin": 30,
+     "repMax": 40,
+     "weight": null,
+     "rest": 45,
+     "cue": "Long lever (ankle on bench)",
+     "group": null,
+     "unit": "secs",
+     "perSide": true
+    },
+    {
+     "name": "Machine chest press",
+     "sets": 3,
+     "repMin": 5,
+     "repMax": 8,
+     "weight": 50,
+     "rest": 0,
+     "cue": "Seat lowered (upper-chest line). Heavy range: add 2.5–5 kg once you get 3 × 8",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Pull-ups",
+     "sets": 3,
+     "repMin": 3,
+     "repMax": 5,
+     "weight": null,
+     "rest": 105,
+     "cue": "Neutral or chin-up grip",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-arm lat pulldown (cable)",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": null,
+     "rest": 60,
+     "cue": "Right (weaker) side first; left matches the right's reps, no more. Pick a weight the right can do 10 with",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg leg press",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 80,
+     "rest": 0,
+     "cue": "Foot high on platform",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg bent-leg calf raise (leg press)",
+     "sets": 3,
+     "repMin": 12,
+     "repMax": 15,
+     "weight": 80,
+     "rest": 90,
+     "cue": "1½ reps (extra bottom half)",
+     "group": "B",
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Cable woodchop",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 10,
+     "weight": 25,
+     "rest": 45,
+     "cue": "Half-kneeling, horizontal",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795162084325
+  },
+  "d1-w1": {
+   "day": 1,
+   "order": 1,
+   "name": "Day 1 · Hips, upper back & chest",
+   "variant": "Week 1 · Baseline",
+   "warmup": "90-90 hip switches 1–2 min · pogos 3×15s building effort · single-leg altitude landings 3×5 each leg (easy if the hip flexor is sore)",
+   "exercises": [
+    {
+     "name": "Hip airplanes",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": 10,
+     "rest": 60,
+     "cue": "Light hand support, 2s pause at end range",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Rear delt fly (machine)",
+     "sets": 3,
+     "repMin": 12,
+     "repMax": 15,
+     "weight": 10,
+     "rest": 0,
+     "cue": "Neutral grip, 2s up / 2s down",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Cable crossovers",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 10,
+     "rest": 90,
+     "cue": "Pulleys at shoulder height",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-arm dumbbell row",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": 20,
+     "rest": 60,
+     "cue": "Right (weaker) side first; left matches the right's reps. Brace on the bench, no twisting",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Straight-leg calf raise (box)",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 20,
+     "rest": 75,
+     "cue": "2s pause in bottom stretch",
+     "group": null,
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-leg hip extension",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 15,
+     "rest": 60,
+     "cue": "Floor bridge, 1s hold at top",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795162084325
+  },
+  "d1-w2": {
+   "day": 1,
+   "order": 2,
+   "name": "Day 1 · Hips, upper back & chest",
+   "variant": "Week 2 · Tempo",
+   "warmup": "90-90 hip switches 1–2 min · pogos 3×15s building effort · single-leg altitude landings 3×5 each leg (easy if the hip flexor is sore)",
+   "exercises": [
+    {
+     "name": "Hip airplanes",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": 10,
+     "rest": 60,
+     "cue": "3s into each rotation, 3s hold",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Rear delt fly (machine)",
+     "sets": 3,
+     "repMin": 12,
+     "repMax": 15,
+     "weight": 10,
+     "rest": 0,
+     "cue": "3s lowering",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Cable crossovers",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 10,
+     "rest": 90,
+     "cue": "3s return, 1s squeeze",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-arm dumbbell row",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": 20,
+     "rest": 60,
+     "cue": "Right (weaker) side first; left matches the right's reps. Brace on the bench, no twisting",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Straight-leg calf raise (box)",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 20,
+     "rest": 75,
+     "cue": "3s lowering",
+     "group": null,
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-leg hip extension",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 15,
+     "rest": 60,
+     "cue": "Shoulders on bench (hip-thrust angle)",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795162084325
+  },
+  "d1-w3": {
+   "day": 1,
+   "order": 3,
+   "name": "Day 1 · Hips, upper back & chest",
+   "variant": "Week 3 · Angle & leverage",
+   "warmup": "90-90 hip switches 1–2 min · pogos 3×15s building effort · single-leg altitude landings 3×5 each leg (easy if the hip flexor is sore)",
+   "exercises": [
+    {
+     "name": "Hip airplanes",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": 10,
+     "rest": 60,
+     "cue": "Hands-free, hold a light plate at chest",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Rear delt fly (machine)",
+     "sets": 3,
+     "repMin": 12,
+     "repMax": 15,
+     "weight": 10,
+     "rest": 0,
+     "cue": "Pronated grip, arms slightly lower",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Cable crossovers",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 10,
+     "rest": 90,
+     "cue": "Pulleys low, sweep low-to-high",
+     "group": "A",
+     "unit": "reps",
+     "perSide": false
+    },
+    {
+     "name": "Single-arm dumbbell row",
+     "sets": 3,
+     "repMin": 8,
+     "repMax": 10,
+     "weight": 20,
+     "rest": 60,
+     "cue": "Right (weaker) side first; left matches the right's reps. Brace on the bench, no twisting",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Straight-leg calf raise (box)",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 10,
+     "rest": 75,
+     "cue": "Single-leg, holding a dumbbell",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    },
+    {
+     "name": "Single-leg hip extension",
+     "sets": 3,
+     "repMin": 10,
+     "repMax": 12,
+     "weight": 15,
+     "rest": 60,
+     "cue": "Bench + dumbbell on hip, 3s lowering",
+     "group": null,
+     "unit": "reps",
+     "perSide": true
+    }
+   ],
+   "updatedAt": 1795162084325
   }
  }
 }
